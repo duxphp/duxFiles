@@ -9,7 +9,7 @@
     ],
     "require": {
         "php": ">=7.0",
-        "guzzlehttp/guzzle": "^0.1",
+        "guzzlehttp/guzzle": "^6.0",
         "ralouphie/mimey": "^6.0"
     },
     "autoload": {
