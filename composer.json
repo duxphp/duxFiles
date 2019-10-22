@@ -1,0 +1,29 @@
+{
+    "name": "duxphp/dux-file",
+    "description": "DuxPHP File management class",
+    "authors": [
+        {
+            "name": "DuxPHP",
+            "email": "admin@duxphp.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "guzzlehttp/guzzle": "^0.1",
+        "ralouphie/mimey": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "dux\\": "src/"
+        }
+    },
+    "keywords": [
+        "duxphp",
+        "OSS",
+        "COS",
+        "Qiniu",
+        "Upyun"
+    ],
+    "homepage": "http://duxphp.com/",
+    "license": "Apache-2.0"
+}
