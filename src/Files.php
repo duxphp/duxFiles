@@ -13,18 +13,15 @@ class Files {
      * @var array
      */
     private $config = [
-        'type' => 'Local',
-        'maxSize' => 1048576, //上传的文件大小限制 默认10M
-        'allowExts' => [], //允许的文件后缀
-        'savePath' => '', //保存路径
-        'saveRule' => 'md5_file', //命名规则
+        'max_size' => 1048576, //保存文件大小限制 默认10M
+        'allow_exts' => [], //允许的文件后缀
+        'save_rule' => 'md5', //命名规则
     ];
 
-    /**
-     * 默认驱动
-     * @var string
-     */
-    private $driver = 'Local';
+    private $driverConfig = [
+        'type' => 'Local',
+        'save_path' => '',
+    ];
 
     /**
      * 文件驱动
@@ -41,9 +38,10 @@ class Files {
     /**
      * 实例化
      * @param array $config
+     * @param array $driverConfig
      */
-    public function __construct($config = []) {
-        $this->driver = $config['type'] ? $config['type'] : [];
+    public function __construct($config = [], $driverConfig = []) {
+        $this->driverConfig = array_merge($this->driverConfig, $driverConfig);
         $this->config = array_merge($this->config, $config);
     }
 
@@ -55,40 +53,64 @@ class Files {
      * @return mixed
      * @throws \Exception
      */
-    public function save($file, $name, $delete = false) {
-        $data = null;
-        if (is_string($file) && is_file($file)) {
-            throw new \Exception("The file does not exist!");
-            $file = file_get_contents($file);
+    public function save($file, $name, $verify = false) {
+        if (is_string($file)) {
+            $file = fopen($file, 'r');
+            if (!$file) {
+                throw new \Exception("The file does not exist!");
+            }
+        }
+        $name = str_replace('\\', '/', $name);
+        if (!$verify) {
+            $ext = pathinfo($name, PATHINFO_EXTENSION);
         }
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->buffer($file);
-
-        $ext = pathinfo($name, PATHINFO_EXTENSION);
+        $content = stream_get_contents($file);
+        rewind($file);
+        $size = strlen($content);
+        $mime = $finfo->buffer($content);
         if (empty($ext)) {
             $ext = (new \Mimey\MimeTypes())->getExtension($mime);
         }
-
-        $name = call_user_func($this->config['saveRule'], $name);
-        $name = $name . '.' . $ext;
+        $ext = strtolower($ext);
+        if ($this->config['allow_exts'] && !in_array($ext, $this->config['allow_exts'])) {
+            throw new \Exception("Save the format is not supported!");
+        }
         $pathInfo = pathinfo($name);
-        if (!$this->getObj()->checkPath($pathInfo['dirname'])) {
+        $dir = trim(trim($pathInfo['dirname'], '.'), '/');
+        $dir = $dir ? "/{$dir}/" : '/';
+        if (!$this->getObj()->checkPath($dir)) {
             throw new \Exception("Do not use the file directory!");
         }
-        $dir = trim(str_replace('\\', '/', $this->config['savePath']), '/') . '/' . trim($pathInfo['dirname'], '/');
-        $info = $this->getObj()->save($data, $dir, $pathInfo['basename'], $mime);
-        if ($delete) {
-            @unlink($file['tmp_name']);
+        $name = $pathInfo['filename'];
+        $fun = $this->config['save_rule'];
+        if ($fun) {
+            $name = call_user_func($fun, $content);
         }
+        $name = $name . '.' . $ext;
+        $info = $this->getObj()->save($file, [
+            'dir' => $dir,
+            'name' => $name,
+            'size' => $size,
+            'mime' => $mime
+        ]);
+        @fclose($file);
+        print_r($info);
         return $info;
+    }
+
+    public function del($name) {
+        $name = trim(str_replace('\\', '/', $name), '/');
+        $name = '/' . $name;
+        return $this->getObj()->del($name);
     }
 
     public function getObj() {
         if ($this->object) {
             return $this->object;
         }
-        $class = "\\dux\\files\\{$this->driver}Driver";
-        $this->object = new $class($this->config);
+        $class = "\\dux\\files\\{$this->driverConfig['type']}Driver";
+        $this->object = new $class($this->driverConfig);
         return $this->object;
     }
 
