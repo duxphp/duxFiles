@@ -55,14 +55,17 @@ class OssDriver implements FilesInterface {
 
     private function getUrl($name, $type, $mime = '') {
         $time = time() + 1800;
-        $policy = $type . "\n";
-        $policy .= "\n";
+        $policy = [];
+        $policy[] = $type;
+        $policy[] = '';
         if ($mime) {
-            $policy .= $mime;
+            $policy[] = $mime;
+        } else {
+            $policy[] = '';
         }
-        $policy .= "\n";
-        $policy .= $time . "\n";
-        $policy .= '/' . $this->config['bucket'] . '/' . trim($name, '/');
+        $policy[] = $time;
+        $policy[] = '/' . $this->config['bucket'] . '/' . trim($name, '/');
+        $policy = implode("\n", $policy);
         $signature = base64_encode(hash_hmac('sha1', $policy, $this->config['secret_key'], true));
         $data = [
             'OSSAccessKeyId' => $this->config['secret_id'],
@@ -70,10 +73,6 @@ class OssDriver implements FilesInterface {
             'Signature' => $signature,
         ];
         return $this->config['url'] . $name . '?' . http_build_query($data);
-    }
-
-    public function getError() {
-        return $this->errorMsg;
     }
 
 

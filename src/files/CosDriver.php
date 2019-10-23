@@ -44,7 +44,7 @@ class CosDriver implements FilesInterface {
         ]);
         $reason = $response->getStatusCode();
         if ($reason <> 200) {
-            throw new \Exception("Oss Upload failed!");
+            throw new \Exception("Cos Upload failed!");
         }
         return $this->config['domain'] . $file;
     }
@@ -58,7 +58,7 @@ class CosDriver implements FilesInterface {
         ]);
         $reason = $response->getStatusCode();
         if ($reason <> 204) {
-            throw new \Exception("Oss Delete failed!");
+            throw new \Exception("Cos Delete failed!");
         }
         return true;
     }

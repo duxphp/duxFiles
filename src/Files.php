@@ -109,7 +109,8 @@ class Files {
         if ($this->object) {
             return $this->object;
         }
-        $class = "\\dux\\files\\{$this->driverConfig['type']}Driver";
+        $driver = ucfirst($this->driverConfig['type']);
+        $class = "\\dux\\files\\{$driver}Driver";
         $this->object = new $class($this->driverConfig);
         return $this->object;
     }
