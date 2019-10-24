@@ -91,7 +91,6 @@ class Files {
             'mime' => $mime
         ]);
         @fclose($file);
-        print_r($info);
         return $info;
     }
 
