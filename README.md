@@ -1,6 +1,6 @@
 
 <p align="center">
-  <a href="https://github.com/duxphp/duxphp-files">
+  <a href="https://github.com/duxphp/duxfiles">
    <img alt="DuxShop" src="https://github.com/duxphp/duxphp/raw/master/docs/logo.png?raw=true">
   </a>
 </p>
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/duxphp/duxphp-files">
+  <a href="https://github.com/duxphp/duxfiles">
     <img alt="maven" src="https://img.shields.io/badge/DuxFile-v1-blue.svg">
   </a>
 
@@ -43,7 +43,7 @@ QQ群：131331864
 
 # bug反馈
 
-[issues反馈](https://github.com/duxphp/duxphp-files/issues)
+[issues反馈](https://github.com/duxphp/duxfiles/issues)
     
 # 版权说明
 
