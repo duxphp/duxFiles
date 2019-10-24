@@ -9,7 +9,7 @@ namespace dux\files;
 class OssDriver implements FilesInterface {
 
     protected $config = [
-        'secret_id' => '',
+        'access_id' => '',
         'secret_key' => '',
         'bucket' => '',
         'domain' => '',
@@ -17,13 +17,11 @@ class OssDriver implements FilesInterface {
     ];
 
     public function __construct($config = []) {
-        $config['url'] = trim(str_replace('\\', '/', $config['url']), '/');
-        $config['domain'] = trim(str_replace('\\', '/', $config['domain']), '/');
         $this->config = array_merge($this->config, $config);
     }
 
     public function checkPath($dir) {
-        if (empty($this->config['secret_id']) || empty($this->config['secret_key']) || empty($this->config['bucket']) || empty($this->config['domain']) || empty($this->config['url'])) {
+        if (empty($this->config['access_id']) || empty($this->config['secret_key']) || empty($this->config['bucket']) || empty($this->config['domain']) || empty($this->config['url'])) {
             throw new \Exception("Oss configuration does not exist!");
         }
         return true;
@@ -68,7 +66,7 @@ class OssDriver implements FilesInterface {
         $policy = implode("\n", $policy);
         $signature = base64_encode(hash_hmac('sha1', $policy, $this->config['secret_key'], true));
         $data = [
-            'OSSAccessKeyId' => $this->config['secret_id'],
+            'OSSAccessKeyId' => $this->config['access_id'],
             'Expires' => $time,
             'Signature' => $signature,
         ];

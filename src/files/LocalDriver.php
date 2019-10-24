@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 本地上传驱动
+ * 本地驱动
  */
 
 namespace dux\files;

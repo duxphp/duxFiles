@@ -17,8 +17,6 @@ class QiniuDriver implements FilesInterface {
     ];
 
     public function __construct($config = []) {
-        $config['url'] = trim(str_replace('\\', '/', $config['url']), '/');
-        $config['domain'] = trim(str_replace('\\', '/', $config['domain']), '/');
         $this->config = array_merge($this->config, $config);
     }
 
@@ -69,12 +67,6 @@ class QiniuDriver implements FilesInterface {
         return true;
     }
 
-    /**
-     * 获取管理签名
-     * @param $type
-     * @param $file
-     * @return array
-     */
     private function getAuth($type, $file) {
         $file = ltrim($file, '/');
         $entry = $this->encode($this->config['bucket'] . ':' . $file);
@@ -87,10 +79,6 @@ class QiniuDriver implements FilesInterface {
         ];
     }
 
-    /**
-     * 获取上传签名
-     * @return string
-     */
     private function getSign() {
         $time = time() + 1800;
         $data = ['scope' => $this->config['bucket'], 'deadline' => $time];

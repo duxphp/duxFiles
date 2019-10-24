@@ -17,8 +17,6 @@ class CosDriver implements FilesInterface {
     ];
 
     public function __construct($config = []) {
-        $config['url'] = trim(str_replace('\\', '/', $config['url']), '/');
-        $config['domain'] = trim(str_replace('\\', '/', $config['domain']), '/');
         $this->config = array_merge($this->config, $config);
     }
 
@@ -35,7 +33,7 @@ class CosDriver implements FilesInterface {
             'Content-Type' => $info['mime'],
             'Content-Length' => $info['size'],
         ];
-        $auth = $this->getSign($file, 'PUT', [], $headers);
+        $auth = $this->getAuth($file, 'PUT', [], $headers);
         $response = (new \GuzzleHttp\Client())->request('PUT', $this->config['url'] . $file, [
             'body' => $data,
             'headers' => array_merge($headers, [
@@ -50,7 +48,7 @@ class CosDriver implements FilesInterface {
     }
 
     public function del($file) {
-        $auth = $this->getSign($file, 'DELETE');
+        $auth = $this->getAuth($file, 'DELETE');
         $response = (new \GuzzleHttp\Client())->request('DELETE', $this->config['url'] . $file, [
             'headers' => [
                 'Authorization' => $auth
@@ -63,7 +61,7 @@ class CosDriver implements FilesInterface {
         return true;
     }
 
-    private function getSign($name, $type, $query = [], $header = []) {
+    private function getAuth($name, $type, $query = [], $header = []) {
         $time = time();
         $expiredTime = $time + 1800;
         $keyTime = $time . ';' . $expiredTime;

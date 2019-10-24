@@ -30,30 +30,26 @@ class Files {
     private $object = null;
 
     /**
-     * 错误信息
-     * @var string
-     */
-    private $error = '';
-
-    /**
      * 实例化
-     * @param array $config
-     * @param array $driverConfig
+     * @param array $config 上传配置
+     * @param array $driverConfig 驱动配置
      */
-    public function __construct($config = [], $driverConfig = []) {
+    public function __construct(array $config = [], array $driverConfig = []) {
+        $driverConfig['url'] = trim(str_replace('\\', '/', $config['url']), '/');
+        $driverConfig['domain'] = trim(str_replace('\\', '/', $config['domain']), '/');
         $this->driverConfig = array_merge($this->driverConfig, $driverConfig);
         $this->config = array_merge($this->config, $config);
     }
 
     /**
      * 保存文件
-     * @param $file
-     * @param $name
-     * @param bool $delete
-     * @return mixed
+     * @param $file 文件流或地址
+     * @param $name 保存文件名
+     * @param bool $verify 强验证格式
+     * @return string 文件路径
      * @throws \Exception
      */
-    public function save($file, $name, $verify = false) {
+    public function save($file, string $name, bool $verify = false) {
         if (is_string($file)) {
             $file = fopen($file, 'r');
             if (!$file) {
@@ -99,12 +95,21 @@ class Files {
         return $info;
     }
 
-    public function del($name) {
+    /**
+     * 删除文件
+     * @param $name 文件名
+     * @return mixed
+     */
+    public function del(string $name) {
         $name = trim(str_replace('\\', '/', $name), '/');
         $name = '/' . $name;
         return $this->getObj()->del($name);
     }
 
+    /**
+     * 驱动对象
+     * @return object
+     */
     public function getObj() {
         if ($this->object) {
             return $this->object;
@@ -113,10 +118,6 @@ class Files {
         $class = "\\dux\\files\\{$driver}Driver";
         $this->object = new $class($this->driverConfig);
         return $this->object;
-    }
-
-    public function getError() {
-        return $this->error;
     }
 
 }
