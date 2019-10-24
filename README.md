@@ -57,7 +57,7 @@ QQ群：131331864
 # 安装说明
 
    ```
-   composer require duxphp/duxphp-files
+   composer require duxphp/dux-file
    ```
    
 # 使用方法
