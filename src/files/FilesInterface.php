@@ -17,7 +17,7 @@ Interface FilesInterface {
 
     /**
      * 路径检查
-     * @param $dir 目录路径
+     * @param string $dir 目录路径
      * @return mixed
      */
     public function checkPath(string $dir);
@@ -29,7 +29,7 @@ Interface FilesInterface {
      * @param string $info 文件信息
      * @return string 文件路径
      */
-    public function save($data, string $info);
+    public function save($data, array $info);
 
 
     /**

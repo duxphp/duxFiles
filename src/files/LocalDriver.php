@@ -12,13 +12,13 @@ class LocalDriver implements FilesInterface {
         'save_path' => ''
     ];
 
-    public function __construct($config = []) {
+    public function __construct(array $config = []) {
         $config['save_path'] = str_replace('\\', '/', $config['save_path']);
         $config['save_path'] = rtrim($config['save_path']);
         $this->config = $config;
     }
 
-    public function checkPath($dir) {
+    public function checkPath(string $dir) {
         $dir = $this->config['save_path'] . $dir;
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
@@ -29,7 +29,7 @@ class LocalDriver implements FilesInterface {
         return true;
     }
 
-    public function save($data, $info) {
+    public function save($data, array $info) {
         $absolutePach = $this->config['save_path'] . $info['dir'] . $info['name'];
         $relativePath = $info['dir'] . $info['name'];
         if (is_file($absolutePach)) {
@@ -43,7 +43,7 @@ class LocalDriver implements FilesInterface {
         return $relativePath;
     }
 
-    public function del($name) {
+    public function del(string $name) {
         $dir = $this->config['save_path'] . '/' . trim($name, '/');
         if (is_file($name)) {
             return @unlink($name);

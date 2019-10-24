@@ -16,18 +16,18 @@ class QiniuDriver implements FilesInterface {
         'url' => ''
     ];
 
-    public function __construct($config = []) {
+    public function __construct(array $config = []) {
         $this->config = array_merge($this->config, $config);
     }
 
-    public function checkPath($dir) {
+    public function checkPath(string $dir) {
         if (empty($this->config['access_key']) || empty($this->config['secret_key']) || empty($this->config['bucket']) || empty($this->config['domain']) || empty($this->config['url'])) {
             throw new \Exception("Qiniu configuration does not exist!");
         }
         return true;
     }
 
-    public function save($data, $info) {
+    public function save($data, array $info) {
         $file = ltrim($info['dir'], '/') . $info['name'];
         $auth = $this->getSign();
         $response = (new \GuzzleHttp\Client())->request('POST', $this->config['url'], [
@@ -53,7 +53,7 @@ class QiniuDriver implements FilesInterface {
         return $this->config['domain'] . '/' . $file;
     }
 
-    public function del($file) {
+    public function del(string $file) {
         $auth = $this->getAuth('delete', $file);
         $response = (new \GuzzleHttp\Client())->request('POST', 'https://rs.qiniu.com' . $auth['path'], [
             'headers' => [

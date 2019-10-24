@@ -16,18 +16,18 @@ class CosDriver implements FilesInterface {
         'url' => ''
     ];
 
-    public function __construct($config = []) {
+    public function __construct(array $config = []) {
         $this->config = array_merge($this->config, $config);
     }
 
-    public function checkPath($dir) {
+    public function checkPath(string $dir) {
         if (empty($this->config['secret_id']) || empty($this->config['secret_key']) || empty($this->config['bucket']) || empty($this->config['domain']) || empty($this->config['url'])) {
             throw new \Exception("Cos configuration does not exist!");
         }
         return true;
     }
 
-    public function save($data, $info) {
+    public function save($data, array $info) {
         $file = $info['dir'] . $info['name'];
         $headers = [
             'Content-Type' => $info['mime'],
@@ -47,7 +47,7 @@ class CosDriver implements FilesInterface {
         return $this->config['domain'] . $file;
     }
 
-    public function del($file) {
+    public function del(string $file) {
         $auth = $this->getAuth($file, 'DELETE');
         $response = (new \GuzzleHttp\Client())->request('DELETE', $this->config['url'] . $file, [
             'headers' => [
