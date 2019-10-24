@@ -43,17 +43,23 @@ class Files {
 
     /**
      * 保存文件
-     * @param $file 文件流或地址
-     * @param $name 保存文件名
+     * @param mixed $file 文件流或地址
+     * @param string $name 保存文件名
      * @param bool $verify 强验证格式
      * @return string 文件路径
      * @throws \Exception
      */
     public function save($file, string $name, bool $verify = false) {
         if (is_string($file)) {
-            $file = fopen($file, 'r');
-            if (!$file) {
-                throw new \Exception("The file does not exist!");
+            if (preg_match("/^http(s)?:\\/\\/.+/", $file)) {
+                $tmp = fopen('php://temp/' . md5($file), 'w');
+                (new \GuzzleHttp\Client())->request('GET', $file, ['sink' => $tmp]);
+                $file = $tmp;
+            } else {
+                $file = fopen($file, 'r');
+                if (!$file) {
+                    throw new \Exception("The file does not exist!");
+                }
             }
         }
         $name = str_replace('\\', '/', $name);
@@ -96,7 +102,7 @@ class Files {
 
     /**
      * 删除文件
-     * @param $name 文件名
+     * @param string $name 文件名
      * @return mixed
      */
     public function del(string $name) {
