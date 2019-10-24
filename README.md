@@ -129,7 +129,8 @@ QQ群：131331864
     ```
     // $path 为文件流或者文件路径、Url
     // $name 保存文件路径名，如：\upload\dux.jpg
-    $file->save($path, $name);
+    // $verify 强制文件验证
+    $file->save($path, $name, $verify = false);
     ```
     
 删除文件
