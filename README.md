@@ -62,91 +62,114 @@ QQ群：131331864
    
 # 使用方法
 
-实例化操作类
+实例化
 
-    ```
-    $config = [
-        'max_size' => 1048576, //保存文件大小限制 默认10M
-        'allow_exts' => [], //允许的文件后缀 默认全部
-        'save_rule' => 'md5', //文件名重置规则 默认文件md5，为空不处理，可回调函数处理
-    ];
-    $file = new \dux\Files($config, $driverConfig);
-    ```
+   ```
+    $driver = \dux\files\Local::class;  //驱动类名
+    $config = []; //驱动配置
+    $file = new \dux\Files($driver, $config);
+   ```
+    
+   ```
+    \\设置保存大小，默认 10M
+    $file->setSize(1048576);
+   ```
+
+   ```
+    \\允许格式，默认全部，如：["jpg", "png"]
+    $file->setExt([]);
+   ```
+    
+   ```
+    \\命名规则，默认文件名MD5，可为回调函数
+    $file->setRule($rule);
+   ```
    
 驱动配置
 
-    ```
-    // 阿里云 Oss
-    $driverConfig = [
-        'type' => 'oss',
-        'access_id' => '',
-        'secret_key' => '',
-        'bucket' => '',   //存储空间
-        'domain' => '',   //访问域名
-        'url' => '',      //接口域名
-    ];
-    ```
-
-    ```
-    // 腾讯云 Cos
-    $driverConfig = [
-        'type' => 'cos',
-        'secret_id' => '',
-        'secret_key' => '',
-        'bucket' => '',   //存储空间
-        'domain' => '',   //访问域名
-        'url' => '',      //接口域名
-    ];
-    ```
-
-    ```
-    // 七牛云存储
-    $driverConfig = [
-        'type' => 'qiniu',
-        'access_key' => '',
-        'secret_key' => '',
-        'bucket' => '',   //存储空间
-        'domain' => '',   //访问域名
-        'url' => '',      //接口域名
-    ];
-    ```
-
-    ```
-    // 又拍云存储
-    $driverConfig = [
-        'type' => 'upyun',
+   ```
+    // 本地文件
+    $driver = \dux\files\LocalDriver::class;
+    $config = [
         'operator' => '', //操作员
         'password' => '', //操作员密码
         'bucket' => '',   //存储空间
         'domain' => '',   //文件域名
         'url' => '',      //接口域名
     ];
-    ```
+   ```
+
+   ```
+    // 阿里云 Oss
+    $driver = \dux\files\OssDriver::class;
+    $config = [
+        'access_id' => '',
+        'secret_key' => '',
+        'bucket' => '',   //存储空间
+        'domain' => '',   //访问域名
+        'url' => '',      //接口域名
+    ];
+   ```
+
+   ```
+    // 腾讯云 Cos
+    $driver = \dux\files\CosDriver::class;
+    $config = [
+        'secret_id' => '',
+        'secret_key' => '',
+        'bucket' => '',   //存储空间
+        'domain' => '',   //访问域名
+        'url' => '',      //接口域名
+    ];
+   ```
+
+   ```
+    // 七牛云存储
+    $driver = \dux\files\QiniuDriver::class;
+    $config = [
+        'access_key' => '',
+        'secret_key' => '',
+        'bucket' => '',   //存储空间
+        'domain' => '',   //访问域名
+        'url' => '',      //接口域名
+    ];
+   ```
+
+   ```
+    // 又拍云存储
+    $driver = \dux\files\UpyunDriver::class;
+    $config = [
+        'operator' => '', //操作员
+        'password' => '', //操作员密码
+        'bucket' => '',   //存储空间
+        'domain' => '',   //文件域名
+        'url' => '',      //接口域名
+    ];
+   ```
 
    
 保存文件
     
-    ```
+   ```
     // $path 为文件流或者文件路径、Url
     // $name 保存文件路径名，如：\upload\dux.jpg
     // $verify 强制文件验证
     $file->save($path, $name, $verify = false);
-    ```
+   ```
     
 删除文件
     
-    ```
+   ```
     // $name 保存文件路径名，如：\upload\dux.jpg
     $file->del($name);
-    ```
+   ```
     
 异常捕获
 
    ```
     try {
-        $file = new \dux\Files($config, $driverConfig);
-        $file->save($path, $name);
+        ...
     } catch (\Exception $e) {
         echo $e->getMessage();
     }
-    ```
+   ```
