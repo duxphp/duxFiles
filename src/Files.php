@@ -72,13 +72,14 @@ class Files {
 
     /**
      * 保存文件
-     * @param mixed $file 文件流或地址
-     * @param string $name 保存文件名
-     * @param bool $verify 强验证格式
-     * @return string 文件路径
-     * @throws \Exception
+     * @param $file
+     * @param string $name
+     * @param bool $verify
+     * @param callable $callback
+     * @return string
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function save($file, string $name, bool $verify = false) {
+    public function save($file, string $name, bool $verify = false, callable $callback) {
         if (is_string($file)) {
             if (preg_match("/^http(s)?:\\/\\/.+/", $file)) {
                 $tmp = fopen('php://temp/' . md5($file), 'w');
@@ -119,6 +120,17 @@ class Files {
             $name = call_user_func($fun, $content);
         }
         $name = $name . '.' . $ext;
+        if($callback) {
+            $file = call_user_func_array($callback, [$file, [
+                'dir' => $dir,
+                'name' => $name,
+                'size' => $size,
+                'mime' => $mime
+            ]]);
+            if(!$file) {
+                throw new \Exception("Returns the file does not exist!");
+            }
+        }
         $info = $this->getObj()->save($file, [
             'dir' => $dir,
             'name' => $name,
@@ -150,7 +162,7 @@ class Files {
         if ($this->object) {
             return $this->object;
         }
-        $this->object = new $this->driver($this->config);
+        $this->object = new $this->driver($this->driverConfig);
         if (!$this->object instanceof \dux\files\FilesInterface) {
             throw new \Exception('The send class must interface class inheritance', 500);
         }
