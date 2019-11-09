@@ -121,12 +121,12 @@ class Files {
         }
         $name = $name . '.' . $ext;
         if ($callback) {
-            $file = call_user_func_array($callback, [$file, ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime]]);
+            $file = call_user_func_array($callback, [$file, ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime, 'ext' => $ext]]);
             if (!$file) {
                 throw new \Exception("Returns the file does not exist!");
             }
         }
-        $info = $this->getObj()->save($file, ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime]);
+        $info = $this->getObj()->save($file, ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime, 'ext' => $ext]);
         @fclose($file);
         return ['url' => $info, 'name' => $dir . $name, 'size' => $size, 'mime' => $mime, 'ext' => $ext];
     }
