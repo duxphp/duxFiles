@@ -14,8 +14,7 @@ class LocalDriver implements FilesInterface {
     ];
 
     public function __construct(array $config = []) {
-        $config['save_path'] = str_replace('\\', '/', $config['save_path']);
-        $config['save_path'] = rtrim($config['save_path']);
+        $config['save_path'] = rtrim(str_replace('\\', '/', $config['save_path']), '/');
         $this->config = array_merge($this->config, $config);
     }
 
