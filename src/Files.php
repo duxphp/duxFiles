@@ -82,9 +82,13 @@ class Files {
     public function save($file, string $name, bool $verify = false, callable $callback) {
         if (is_string($file)) {
             if (preg_match("/^http(s)?:\\/\\/.+/", $file)) {
-                $tmp = fopen('php://temp/' . md5($file), 'w');
-                (new \GuzzleHttp\Client())->request('GET', $file, ['sink' => $tmp]);
-                $file = $tmp;
+                $url = $file;
+                $file = fopen('php://temp/' . md5($url), 'w');
+                $request = (new \GuzzleHttp\Client())->request('GET', $url, ['headers' => [
+                    'Referer' => $url,
+                ]]);
+                fwrite($file, $request->getBody()->getContents());
+                rewind($file);
             } else {
                 $file = fopen($file, 'r');
                 if (!$file) {
@@ -120,15 +124,17 @@ class Files {
             $name = call_user_func($fun, $content);
         }
         $name = $name . '.' . $ext;
+        $info = ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime, 'ext' => $ext];
         if ($callback) {
-            $file = call_user_func_array($callback, [$file, ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime, 'ext' => $ext]]);
+            $file = call_user_func_array($callback, [$file, $info]);
             if (!$file) {
                 throw new \Exception("Returns the file does not exist!");
             }
         }
-        $info = $this->getObj()->save($file, ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime, 'ext' => $ext]);
+        $url = $this->getObj()->save($file, $info);
         @fclose($file);
-        return ['url' => $info, 'name' => $dir . $name, 'size' => $size, 'mime' => $mime, 'ext' => $ext];
+        $info['url'] = $url;
+        return $info;
     }
 
     /**
