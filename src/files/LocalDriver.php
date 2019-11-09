@@ -9,13 +9,14 @@ namespace dux\files;
 class LocalDriver implements FilesInterface {
 
     protected $config = [
+        'domain' => '',
         'save_path' => ''
     ];
 
     public function __construct(array $config = []) {
         $config['save_path'] = str_replace('\\', '/', $config['save_path']);
         $config['save_path'] = rtrim($config['save_path']);
-        $this->config = $config;
+        $this->config = array_merge($this->config, $config);
     }
 
     public function checkPath(string $dir) {
@@ -32,15 +33,12 @@ class LocalDriver implements FilesInterface {
     public function save($data, array $info) {
         $absolutePach = $this->config['save_path'] . $info['dir'] . $info['name'];
         $relativePath = $info['dir'] . $info['name'];
-        if (is_file($absolutePach)) {
-            return $relativePath;
-        }
         $file = fopen($absolutePach, "w+");
         if (!stream_copy_to_stream($data, $file)) {
             throw new \Exception("The file save failed!");
         }
         fclose($file);
-        return $relativePath;
+        return $this->config['domain'] . $relativePath;
     }
 
     public function del(string $name) {

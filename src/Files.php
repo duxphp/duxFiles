@@ -120,25 +120,15 @@ class Files {
             $name = call_user_func($fun, $content);
         }
         $name = $name . '.' . $ext;
-        if($callback) {
-            $file = call_user_func_array($callback, [$file, [
-                'dir' => $dir,
-                'name' => $name,
-                'size' => $size,
-                'mime' => $mime
-            ]]);
-            if(!$file) {
+        if ($callback) {
+            $file = call_user_func_array($callback, [$file, ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime]]);
+            if (!$file) {
                 throw new \Exception("Returns the file does not exist!");
             }
         }
-        $info = $this->getObj()->save($file, [
-            'dir' => $dir,
-            'name' => $name,
-            'size' => $size,
-            'mime' => $mime
-        ]);
+        $info = $this->getObj()->save($file, ['dir' => $dir, 'name' => $name, 'size' => $size, 'mime' => $mime]);
         @fclose($file);
-        return $info;
+        return ['url' => $info, 'name' => $dir . $name, 'size' => $size, 'mime' => $mime, 'ext' => $ext];
     }
 
     /**
