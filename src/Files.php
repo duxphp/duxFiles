@@ -81,12 +81,18 @@ class Files {
      */
     public function save($file, string $name, bool $verify = false, callable $callback) {
         if (is_string($file)) {
-            if (preg_match("/^http(s)?:\\/\\/.+/", $file)) {
+            if (preg_match("/^http(s)?:\\/\\/.+/", $file) || substr($file, 0, 2) == '//') {
+                if (substr($file, 0, 2) == '//') {
+                    $file = 'http:' . $file;
+                }
                 $url = $file;
                 $file = fopen('php://temp/' . md5($url), 'w');
-                $request = (new \GuzzleHttp\Client())->request('GET', $url, ['headers' => [
-                    'Referer' => $url,
-                ]]);
+                $request = (new \GuzzleHttp\Client())->request('GET', $url, [
+                    'headers' => [
+                        'Referer' => $url,
+                    ],
+                    'timeout' => 10
+                ]);
                 fwrite($file, $request->getBody()->getContents());
                 rewind($file);
             } else {
@@ -105,7 +111,7 @@ class Files {
         rewind($file);
         $size = strlen($content);
         $mime = $finfo->buffer($content);
-        if (empty($ext)) {
+        if (empty($ext) || !in_array($ext, $this->config['allow_exts'])) {
             $ext = (new \Mimey\MimeTypes())->getExtension($mime);
         }
         $ext = strtolower($ext);
