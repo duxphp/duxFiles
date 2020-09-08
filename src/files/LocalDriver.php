@@ -41,9 +41,9 @@ class LocalDriver implements FilesInterface {
     }
 
     public function del(string $name) {
-        $dir = $this->config['save_path'] . '/' . trim($name, '/');
-        if (is_file($name)) {
-            return @unlink($name);
+        $path = $this->config['save_path'] . '/' . trim($name, '/');
+        if (is_file($path)) {
+            return @unlink($path);
         }
         return true;
     }
