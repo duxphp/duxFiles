@@ -29,12 +29,11 @@ class QiniuDriver implements FilesInterface {
 
     public function save($data, array $info) {
         $file = ltrim($info['dir'], '/') . $info['name'];
-        $auth = $this->getSign();
         $response = (new \GuzzleHttp\Client())->request('POST', $this->config['url'], [
             'multipart' => [
                 [
                     'name' => 'token',
-                    'contents' => $auth
+                    'contents' => $this->getSign($file)
                 ],
                 [
                     'name' => 'key',
@@ -70,7 +69,7 @@ class QiniuDriver implements FilesInterface {
     private function getAuth($type, $file) {
         $file = ltrim($file, '/');
         $entry = $this->encode($this->config['bucket'] . ':' . $file);
-        $path = '/' . $type . '/' . $entry;
+        $path = ($type ? '/' . $type : '') . '/' . $entry;
         $sign = $this->encode(hash_hmac('sha1', $path . "\n", $this->config['secret_key'], true));
         $auth = 'QBox ' . $this->config['access_key'] . ':' . $sign;
         return [
@@ -79,9 +78,9 @@ class QiniuDriver implements FilesInterface {
         ];
     }
 
-    private function getSign() {
+    private function getSign($file) {
         $time = time() + 1800;
-        $data = ['scope' => $this->config['bucket'], 'deadline' => $time];
+        $data = ['scope' => $this->config['bucket'] . ':' . $file, 'deadline' => $time];
         $data = $this->encode(json_encode($data));
         return $this->sign($this->config['secret_key'], $this->config['access_key'], $data) . ':' . $data;
     }
